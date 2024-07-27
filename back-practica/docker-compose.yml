@@ -1,0 +1,11 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      DATABASE_HOST: ${POSTGRE_HOST}
+      POSTGRES_USER: ${POSTGRE_USER}
+      POSTGRES_PASSWORD: ${POSTGRE_PASS}
+    ports:
+      - 5432:5432
