@@ -5,11 +5,9 @@ export class RegisterUserDto {
     public username: string,
     public email: string,
     public password: string,
-    public userApproval: boolean,
-    public dateApproval: string | null,
+
     public rolId: number,
-    public statusId: string,
-    public cashIds: number[]
+    public statusId: string // public cashIds: number[]
   ) {}
 
   static create(object: { [key: string]: any }): [string?, RegisterUserDto?] {
@@ -17,11 +15,9 @@ export class RegisterUserDto {
       username,
       email,
       password,
-      userApproval,
-      dateApproval,
       rolId,
       statusId,
-      cashIds,
+      // cashIds,
     } = object;
 
     if (!username) return ["Missing username"];
@@ -38,11 +34,9 @@ export class RegisterUserDto {
         username,
         email,
         password,
-        userApproval,
-        dateApproval,
         rolId,
-        statusId,
-        cashIds
+        statusId
+        // cashIds
       ),
     ];
   }

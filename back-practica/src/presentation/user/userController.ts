@@ -1,9 +1,11 @@
 import { Request, Response } from "express";
 import { ClientRepository, RegisterClientDto } from "../../domain";
 import { CustomError } from "../../infrastructure";
+import { UserRepository } from "../../domain/repositories/user.repository";
+import { RegisterUserDto } from "../../domain/dtos/user.dto";
 
-export class ClientController {
-  constructor(private readonly clientRepository: ClientRepository) {}
+export class UserController {
+  constructor(private readonly userRepository: UserRepository) {}
 
   private handleError = (error: unknown, res: Response) => {
     if (error instanceof CustomError) {
@@ -12,25 +14,61 @@ export class ClientController {
     console.log(error);
     return res.status(500).json({ error: "Internal Server Error" });
   };
-
-  registerClient = async (req: Request, res: Response) => {
+  /**
+   *
+   * @param req
+   * @param res
+   * @returns
+   */
+  registerUser = async (req: Request, res: Response) => {
     try {
-      const [error, registerClientDto] = RegisterClientDto.create(req.body);
+      const { currentUserId, newUser } = req.body;
+
+      const [error, registerUserDto] = RegisterUserDto.create(newUser);
 
       if (error) {
         return res.status(400).json({ error });
       }
 
-      const client = await this.clientRepository.register(registerClientDto!);
+      const user = await this.userRepository.register(
+        currentUserId,
+        registerUserDto!
+      );
 
-      res.status(201).json(client);
+      res.status(201).json(user);
     } catch (error) {
       this.handleError(error, res);
     }
   };
-  getAllClients = async (req: Request, res: Response) => {
+
+  updateUser = async (req: Request, res: Response) => {
     try {
-      const clients = await this.clientRepository.findAll();
+      const userId = Number(req.params.userId);
+      const { editUser, currentUserId } = req.body;
+
+      // Validar y crear el DTO para la actualización
+      const [error, updateUserDto] = RegisterUserDto.create(editUser);
+
+      if (error) {
+        return res.status(400).json({ error });
+      }
+
+      // Llamar al método de servicio o repositorio para actualizar el usuario
+      const updatedUser = await this.userRepository.update(
+        userId,
+        updateUserDto!,
+        currentUserId
+      );
+
+      res.status(200).json(updatedUser);
+    } catch (error) {
+      this.handleError(error, res);
+    }
+  };
+
+  getAllUsers = async (req: Request, res: Response) => {
+    try {
+      const clients = await this.userRepository.findAll();
 
       res.status(200).json(clients);
     } catch (error) {
@@ -38,32 +76,27 @@ export class ClientController {
     }
   };
 
-  updateClient = async (req: Request, res: Response) => {
+  deleteUser = async (req: Request, res: Response) => {
     try {
-      const clientId = parseInt(req.params.id, 10);
-      const [error, clientUpdateDto] = RegisterClientDto.create(req.body);
+      const userId = Number(req.params.userId); // Extraer userId de los parámetros de la URL
 
-      if (error) {
-        return res.status(400).json({ error });
-      }
+      await this.userRepository.delete(userId);
 
-      const updatedClient = await this.clientRepository.update(
-        clientId,
-        clientUpdateDto!
-      );
-      res.status(200).json(updatedClient);
+      res.status(200).send({ message: `User successfully deleted ${userId}` });
     } catch (error) {
       this.handleError(error, res);
     }
   };
 
-  deleteClient = async (req: Request, res: Response) => {
+  validatorUser = async (req: Request, res: Response) => {
     try {
-      const clientId = parseInt(req.params.id, 10);
-
-      await this.clientRepository.delete(clientId);
-
-      res.status(200).json({ message: "Client successfully deleted" });
+      const userId = Number(req.params.userId);
+      const { currentUserId } = req.body;
+      const updatedValidator = await this.userRepository.validator(
+        userId,
+        currentUserId
+      );
+      res.status(200).json(updatedValidator);
     } catch (error) {
       this.handleError(error, res);
     }
