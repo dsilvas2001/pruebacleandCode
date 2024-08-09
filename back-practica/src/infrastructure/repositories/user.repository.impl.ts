@@ -7,8 +7,11 @@ import { UserRepository } from "../../domain/repositories/user.repository";
 export class UserRepositoryImpl implements UserRepository {
   constructor(private readonly userDatasource: UserDatasource) {}
 
-  async createUser(createUserDto: RegisterUserDto): Promise<UserEntity> {
-    return this.userDatasource.createUser(createUserDto);
+  async register(
+    currentUserId: number,
+    createUserDto: RegisterUserDto
+  ): Promise<UserEntity> {
+    return this.userDatasource.register(currentUserId, createUserDto);
   }
 
   async findAll(): Promise<UserEntity[]> {
@@ -17,12 +20,17 @@ export class UserRepositoryImpl implements UserRepository {
 
   async update(
     userId: number,
-    userUpdateDto: RegisterUserDto
+    userUpdateDto: RegisterUserDto,
+    currentUserId: number
   ): Promise<UserEntity> {
-    return this.userDatasource.update(userId, userUpdateDto);
+    return this.userDatasource.update(userId, userUpdateDto, currentUserId);
   }
 
   async delete(userId: number): Promise<void> {
     return this.userDatasource.delete(userId);
+  }
+
+  async validator(userId: number, currentUser: number): Promise<UserEntity> {
+    return this.userDatasource.validator(userId, currentUser);
   }
 }

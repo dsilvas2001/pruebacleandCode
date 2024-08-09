@@ -1,24 +1,24 @@
 import { Request, Response, Router } from "express";
-import {
-  ClientDatasourceImpl,
-  ClientRepositoryImpl,
-} from "../../infrastructure";
-import { ClientController } from "./userController";
+import { UserController } from "./userController";
+import { UserDatasourceImpl } from "../../infrastructure/datasource/user.datasource.impl";
+import { UserRepositoryImpl } from "../../infrastructure/repositories/user.repository.impl";
 
-export class AuthRoutes {
+export class UserRoutes {
   static get routes(): Router {
     const router = Router();
-    const datasourceI = new ClientDatasourceImpl();
-    const clientRepositoryI = new ClientRepositoryImpl(datasourceI);
-    const controller = new ClientController(clientRepositoryI);
+    const datasourceI = new UserDatasourceImpl();
+    const userRepositoryI = new UserRepositoryImpl(datasourceI);
+    const controller = new UserController(userRepositoryI);
 
-    router.post("/register", controller.registerClient);
+    router.post("/register", controller.registerUser);
 
-    router.get("/", controller.getAllClients);
+    router.get("/", controller.getAllUsers);
 
-    router.put("/update/:id", controller.updateClient);
+    router.put("/update/:userId", controller.updateUser);
 
-    router.delete("/:id", controller.deleteClient);
+    router.put("/validator/:userId", controller.validatorUser);
+
+    router.delete("/:userId", controller.deleteUser);
 
     return router;
   }

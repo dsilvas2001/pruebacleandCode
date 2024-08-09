@@ -27,11 +27,16 @@ export class User extends BaseTable {
   @Column({ length: 100 })
   password: string;
 
-  @Column()
+  @ManyToOne(() => User, { nullable: true })
+  @JoinColumn({ name: "createdById" })
+  createdBy: User;
+
+  @Column({ default: false })
   userApproval: boolean;
 
   @Column({ type: "timestamptz", default: null })
   dateApproval: string | null;
+
   /**
    *
    */

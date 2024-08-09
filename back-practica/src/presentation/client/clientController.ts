@@ -40,7 +40,7 @@ export class ClientController {
 
   updateClient = async (req: Request, res: Response) => {
     try {
-      const clientId = parseInt(req.params.id, 10);
+      const clientId = Number(req.params.id);
       const [error, clientUpdateDto] = RegisterClientDto.create(req.body);
 
       if (error) {
